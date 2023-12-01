@@ -1,19 +1,23 @@
 #include "StateMachine.h"
 
-int main(){
+int main() {
     set<char> alphabet = {'0', '1'};
-    vector<string> states = {"S1", "S2"};
-    string startState = "S1";
+    vector<string> states = {"S0", "S1", "S2"};
+    string startState = "S0";
     string acceptState = "S2";
     vector<vector<string>> transitionTable = {
+        {"S1", "S0"},
         {"S2", "S1"},
         {"S1", "S2"}
     };
-    FiniteAutomaton Oleg(alphabet, states, startState, acceptState, transitionTable);
-    string inputString = "112321312";
+    FiniteAutomaton ATM(alphabet, states, startState, acceptState, transitionTable);
+    string inputString;
+    cout << "ВВедите строку для проверки: " << endl;
+    cin >> inputString;
 
-    Oleg.setInputString(inputString);
-    if (Oleg.isReachable(acceptState)) 
+
+    ATM.setInputString(inputString);
+    if (ATM.isReachable(acceptState)) 
         cout << "Целевое состояние достижимо" << endl;
     else
         cout << "Целевое состояние не достижимо";
