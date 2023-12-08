@@ -1,25 +1,31 @@
 #include "StateMachine.h"
 
 int main() {
-    set<char> alphabet = {'0', '1'};
+    set<string> alphabet = {"zero", "one"};
     vector<string> states = {"S0", "S1", "S2"};
     string startState = "S0";
     string acceptState = "S2";
-    vector<vector<string>> transitionTable = {
-        {"S1", "S0"},
-        {"S2", "S1"},
-        {"S1", "S2"}
+    map<pair<string, string>, string> transitionTable = {
+        {{"S0", "zero"}, "S1"},
+        {{"S0", "one"}, "S0"},
+        {{"S1", "zero"}, "S1"},
+        {{"S1", "one"}, "S2"},
+        {{"S2", "one"}, "S0"},
+        {{"S2", "zero"}, "S1"},
     };
-    FiniteAutomaton ATM(alphabet, states, startState, acceptState, transitionTable);
     string inputString;
     cout << "ВВедите строку для проверки: " << endl;
     cin >> inputString;
 
+    FiniteAutomaton ATM(alphabet, states, startState, transitionTable, inputString);
+    ATM.lexemesCheck();
 
-    ATM.setInputString(inputString);
-    if (ATM.isReachable(acceptState)) 
+     
+    if (ATM.isReachable(startState, acceptState)) 
         cout << "Целевое состояние достижимо" << endl;
     else
-        cout << "Целевое состояние не достижимо";
+        cout << "Целевое состояние не достижимо"; 
+    
+    
     return 0;
 }

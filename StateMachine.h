@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <map>
 
 #ifndef Automaton
 #define Automaton
@@ -11,59 +12,64 @@ using namespace std;
 
 class FiniteAutomaton {
 private:
-    set<char> alphabet;
-    vector<string> states;
     string startState;
-    string acceptState;
-    vector<vector<int>> transitionTable;
     string inputString;
+    set<string> alphabet;
+    vector<string> states;
+    vector<string> lexemes;
+    map<pair<string, string>, string> transitionTable;
 public:
-    // Метод для поиска индекса состояния
-    int getIndex(const string &state) {
-        auto it = find(states.begin(), states.end(), state);
-        if (it != states.end())
-            return distance(states.begin(), it);
-        else {
-            cout << "Ошибка: Состояние не найдено" << endl;
-            return 0;
-        }
-    }
-
-    void setInputString(const string &input) {
-        inputString = input;
-    }
-
     // Конструктор
-    FiniteAutomaton(set<char> alphabet,
+    FiniteAutomaton(set<string> alphabet,
                     vector<string> states,
                     string startState,
-                    string acceptState,
-                    vector<vector<string>> transitionTableStrings)
-        : alphabet(alphabet), states(states), startState(startState), acceptState(acceptState) {
+                    map<pair<string, string>, string> transitionTable,
+                    string inputString)
+        : alphabet(alphabet), states(states), startState(startState), transitionTable(transitionTable), inputString(inputString) {
         
-        // Преобразование строк в числовые индексы и заполнение transitionTable
-        for (const auto& row : transitionTableStrings) {
-            vector<int> numericRow;
-            for (const auto& state : row) {
-                numericRow.push_back(getIndex(state));
+        // Конвертация входной строки в символы алфавита
+        for (int stringIndex = 0; stringIndex < inputString.length();) {
+            bool isSymbolFound = false;
+
+            for (const auto& symbol : alphabet) {
+                if (inputString.compare(stringIndex, symbol.length(), symbol) == 0) {
+                    lexemes.push_back(symbol);
+                    stringIndex += symbol.length();
+                    isSymbolFound = true;
+                    break;
+                }
             }
-            transitionTable.push_back(numericRow);
+
+            if (!isSymbolFound) {
+                cerr << "Error: Invalid input string!" << endl;
+                break;
+            }
         }
     }
 
-    bool isReachable(string targetState) {
-        int currentStateIndex = getIndex(startState); 
-        for (char symbol : inputString) {
-            if (currentStateIndex < transitionTable.size() && symbol - '0' < alphabet.size()) {
-                currentStateIndex = transitionTable[currentStateIndex][symbol - '0'];
-            } 
-            else {
-                cout << "Ошибка: Недопустимый символ в строке или таблице переходов" << endl;
-                return false;
-            }
-        }
-        return states[currentStateIndex] == targetState;
+    void lexemesCheck(){
+        for (auto elem: lexemes)
+            cout << elem << " ";
+        cout << endl;
     }
+
+    bool isReachable(string currentState, string targetState) {
+    for (const auto &lexeme : lexemes) {
+        auto transition = make_pair(currentState, lexeme);
+
+        if (transitionTable.find(transition) != transitionTable.end()) {
+            currentState = transitionTable[transition];
+            if (currentState == targetState)
+            return true;
+        } else {
+            cerr << "Error: No transition for state " << currentState << " with lexeme " << lexeme << endl;
+            return false;
+        }
+    }
+
+    return false;
+}
+
 };
 
 #endif
