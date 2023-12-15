@@ -19,7 +19,7 @@ private:
     vector<string> lexemes;
     map<pair<string, string>, string> transitionTable;
 public:
-    // Конструктор
+    // Constructor
     FiniteAutomaton(set<string> alphabet,
                     vector<string> states,
                     string startState,
@@ -27,7 +27,7 @@ public:
                     string inputString)
         : alphabet(alphabet), states(states), startState(startState), transitionTable(transitionTable), inputString(inputString) {
         
-        // Конвертация входной строки в символы алфавита
+        // Converting an input string to alphabet characters
         for (int stringIndex = 0; stringIndex < inputString.length();) {
             bool isSymbolFound = false;
 
@@ -53,22 +53,24 @@ public:
         cout << endl;
     }
 
-    bool isReachable(string currentState, string targetState) {
-    for (const auto &lexeme : lexemes) {
-        auto transition = make_pair(currentState, lexeme);
+    bool isReachable (vector<string> targetStates) {
+        string currentState = startState;
+            for (const auto &lexeme : lexemes) {
+                auto transition = make_pair(currentState, lexeme);
 
-        if (transitionTable.find(transition) != transitionTable.end()) {
-            currentState = transitionTable[transition];
-            if (currentState == targetState)
-            return true;
-        } else {
-            cerr << "Error: No transition for state " << currentState << " with lexeme " << lexeme << endl;
-            return false;
-        }
+                if (transitionTable.find(transition) != transitionTable.end()) {
+                    currentState = transitionTable[transition];
+                    for (auto targetState : targetStates)
+                        if (currentState == targetState)
+                            return true;
+                }
+                else {
+                    cerr << "Error: No transition for state " << currentState << " with lexeme " << lexeme << endl;
+                    return false;
+                }
+            }
+        return false;
     }
-
-    return false;
-}
 
 };
 
